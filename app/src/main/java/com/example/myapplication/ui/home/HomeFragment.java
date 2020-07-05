@@ -11,8 +11,18 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.R;
+import com.example.myapplication.widget.CommonphrasesAdapter;
+import com.example.myapplication.widget.IMConversation;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
 
 public class HomeFragment extends Fragment {
 
@@ -23,13 +33,46 @@ public class HomeFragment extends Fragment {
         homeViewModel =
                 ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-        final TextView textView = root.findViewById(R.id.text_home);
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
         return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        RecyclerView recyclerView=view.findViewById(R.id.buy_list);
+        LinearLayoutManager llm = new LinearLayoutManager(this.getContext());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(llm);
+        CommonphrasesAdapter adapter=new CommonphrasesAdapter(getActivity());
+
+        recyclerView.setAdapter(adapter);
+
+
+        //TODO 不知道消息顺序怎样 先写个比较器
+        Comparator conversationComparator=new Comparator<IMConversation>() {
+            @Override
+            public int compare(IMConversation o1, IMConversation o2) {
+                if(o1.name.contains("系统消息")){
+                    return -1;
+                }else if(o2.name.contains("系统消息")){
+                    return 1;
+                }else{
+                    return o1.time>o2.time?-1:1;
+                }
+            }
+        };
+
+        ArrayList<IMConversation> data=new ArrayList<>();
+        for(int i=0;i<30;i++){
+            IMConversation imConversation=new IMConversation();
+            imConversation.time=i;
+            imConversation.name=new Random().nextInt()+"   "+i;
+            if(i==14||i==10){
+                imConversation.name="系统消息1";
+            }
+            data.add(imConversation);
+        }
+        Collections.sort(data,conversationComparator);
+        adapter.setData(data);
     }
 }

@@ -8,4 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <declare-styleable name="QuickReturnLayout">
+        <attr name="quickReturnScrollableChild" format="reference"/>
+        <attr name="quickReturnHeaderChild" format="reference"/>
+        <attr name="quickReturnHeaderChildVisible" format="reference"/>
+    </declare-styleable>
+
 </resources>
