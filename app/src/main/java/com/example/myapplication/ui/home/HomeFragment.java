@@ -45,6 +45,8 @@ public class HomeFragment extends Fragment {
         LinearLayoutManager llm = new LinearLayoutManager(this.getContext());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
+
+
         CommonphrasesAdapter adapter=new CommonphrasesAdapter(getActivity());
 
         recyclerView.setAdapter(adapter);
