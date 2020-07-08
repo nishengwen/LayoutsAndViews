@@ -1,0 +1,3 @@
+[submodule "imModule"]
+	path = imModule
+	url = git@gitlab.renrenche.com:DQD_Android_module/imModule.git
