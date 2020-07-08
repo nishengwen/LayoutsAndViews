@@ -30,10 +30,7 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-
-
-                ViewModelProviders.of(this).get(HomeViewModel.class);
+        homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         return root;
     }
@@ -71,6 +68,8 @@ public class HomeFragment extends Fragment {
             imConversation.name=new Random().nextInt()+"   "+i;
             if(i==14||i==10){
                 imConversation.name="系统消息1";
+
+
             }
             data.add(imConversation);
         }
