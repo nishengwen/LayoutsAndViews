@@ -44,7 +44,10 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(llm);
         CommonphrasesAdapter adapter=new CommonphrasesAdapter(getActivity());
 
+
         recyclerView.setAdapter(adapter);
+
+
 
 
         //TODO 不知道消息顺序怎样 先写个比较器
