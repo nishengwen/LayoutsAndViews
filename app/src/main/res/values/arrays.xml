@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="praise_array">
+            <item>svga/live_praise/live_praise_blue_car.svga</item>
+            <item>svga/live_praise/live_praise_chicken_food.svga</item>
+            <item>svga/live_praise/live_praise_green_car.svga</item>
+            <item>svga/live_praise/live_praise_purple_heart.svga</item>
+            <item>svga/live_praise/live_praise_red_car.svga</item>
+            <item>svga/live_praise/live_praise_red_flower.svga</item>
+            <item>svga/live_praise/live_praise_red_gift.svga</item>
+            <item>svga/live_praise/live_praise_yellow.svga</item>
+    </string-array>
+</resources>
