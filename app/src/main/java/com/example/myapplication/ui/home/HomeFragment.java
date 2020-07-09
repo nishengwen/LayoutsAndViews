@@ -45,7 +45,7 @@ public class HomeFragment extends Fragment {
         CommonphrasesAdapter adapter=new CommonphrasesAdapter(getActivity());
 
 
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(adapter    );
 
 
 
