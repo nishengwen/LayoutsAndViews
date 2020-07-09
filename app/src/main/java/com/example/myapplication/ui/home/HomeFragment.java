@@ -75,5 +75,23 @@ public class HomeFragment extends Fragment {
         }
         Collections.sort(data,conversationComparator);
         adapter.setData(data);
+        final PopTextView ptt=  view.findViewById(R.id.text);
+
+
+        view.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ptt.showAnnouncement("公告"+i++);
+            }
+        });
+        view.findViewById(R.id.button).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                i=0;
+                ptt.showFirstPopText("第一次");
+                return true;
+            }
+        });
     }
+    int i=0;
 }
