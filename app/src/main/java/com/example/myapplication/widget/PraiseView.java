@@ -9,10 +9,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Interpolator;
+
 import com.example.myapplication.R;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -28,6 +29,8 @@ public class HeartView extends View {
     protected void onFinishInflate() {
         super.onFinishInflate();
         initPaint();
+        interpolator = new AccelerateDecelerateInterpolator();
+        addOtherPic();
     }
     //一个完整动画的时长
     private float mLeafFloatTime = 2500;
@@ -45,33 +48,53 @@ public class HeartView extends View {
         if(targetBitmapDes.isEmpty()) {
             postInvalidate();
         }
-        targetBitmapDes.add(heartFactory.generateHeart());
+        targetBitmapDes.add(bitmapDesFactory.generateHeart());
     }
 
-    AccelerateDecelerateInterpolator accelerateDecelerateInterpolator = new AccelerateDecelerateInterpolator();
-    private void getNowHeart(BitmapDes bitmapDes, long currentTime) {
-        long intervalTime = currentTime - bitmapDes.startTime;
+    //动画差值器
+    private Interpolator interpolator ;
+    public void setInterpolator(Interpolator interpolator){
+        if(interpolator==null)return;
+        this.interpolator=interpolator;
+    }
+
+    private void getNowBitmapPosition(BitmapDes bitmapDes) {
+        long intervalTime = System.currentTimeMillis() - bitmapDes.addTime;
+        //如果动画播放的间隔0~mLeafFloatTime 就为有效      300是弥补隐藏时间
         if (intervalTime < 0) {
+            //没到时间播放
             return;
-        } else if (intervalTime > mLeafFloatTime - 300) {
+        } else if (intervalTime > mLeafFloatTime) {
+            //已经过时了，移除就好了
             targetBitmapDes.remove(bitmapDes);
             return;
         }
+        //时间百分比就是时间因子
         float fraction = (float) intervalTime / mLeafFloatTime;
-        //0～1   对应  0.2~0.5
-        bitmapDes.scale = Math.min(2 * Math.max(fraction, 0.2f), 1);
-        fraction = fraction * accelerateDecelerateInterpolator.getInterpolation(fraction);
-        bitmapDes.x = getLocationX(bitmapDes) + mTotalWidth / 2f - (bitmapDes.scale * bitmapWidth / 2f);
-        bitmapDes.y = (int) (mTotalHeight - bitmapDes.t * fraction);
-        bitmapDes.alpha = Math.max((int) (-600 * Math.max(fraction, 0.5) + 555), 0);
+        //可动态改变大小
+        bitmapDes.scale = 1f;
+        //时间因子换成路程因子
+        fraction = fraction * interpolator.getInterpolation(fraction);
+        bitmapDes.y = (int) (mTotalHeight -bitmapDes.scale*bitmapDes.h()*1.5f)*(1-fraction);
+        // mTotalWidth / 2f -(bitmapDes.scale * bitmapWidth / 2f) 为原点的marginleft值   加上实际的正玄函数值就是实际位置
+        bitmapDes.x = mTotalWidth / 2f -(bitmapDes.scale * bitmapDes.w() / 2f)+ center2centerDistance(bitmapDes);
+        //0-0.5  255   //0.5-1     255-0
+        if (fraction < 0.8) {
+            bitmapDes.alpha=255;
+        }else{
+            //两点求直线公式
+            bitmapDes.alpha= (int) ((fraction-0.8f)/0.2*-255+255);
+        }
     }
-
-    // 通过叶子信息获取当前叶子的X值
-    private int getLocationX(BitmapDes bitmapDes) {
+    private int center2centerDistance(BitmapDes bitmapDes) {
+        //w频率   t是周期
         float w = (float) Math.PI / bitmapDes.t;
-        float a = (mTotalWidth - bitmapWidth) / 2f;
+        //a振幅（图片不变形的最大振幅）
+        float a = (mTotalWidth - bitmapDes.w()) / 2f;
+        //随机振幅
         a = bitmapDes.randomA * a;
-        return (int) (a * Math.sin(w * (mTotalHeight - bitmapDes.y)));
+        //余弦公式    y= a*sin(w*x)    w=2pi/t   这里w缩小了一半就是振动慢一半 只是一半的余弦
+        return (int) (a * Math.sin(w * (mTotalHeight -bitmapDes.y-bitmapDes.scale * bitmapDes.h()*1.5f)));
     }
 
     /**
@@ -80,10 +103,9 @@ public class HeartView extends View {
      * @param canvas
      */
     private void drawBitmapDes(Canvas canvas) {
-        long currentTime = System.currentTimeMillis();
         for (int i = targetBitmapDes.size() - 1; i >= 0; i--) {
             BitmapDes bitmapDes = targetBitmapDes.get(i);
-            getNowHeart(bitmapDes, currentTime);
+            getNowBitmapPosition(bitmapDes);
         }
 
         for (BitmapDes bitmapDes : targetBitmapDes) {
@@ -92,26 +114,14 @@ public class HeartView extends View {
             matrix.setScale(bitmapDes.scale, bitmapDes.scale);
             matrix.postTranslate(bitmapDes.x, bitmapDes.y);
             mBitmapPaint.setAlpha(bitmapDes.alpha);
-
-            if (bitmapDes.otherPicType==-1&& bitmapDes.heartType == HeartType.RED) {
-                canvas.drawBitmap(mRedBitmap, matrix, mBitmapPaint);
-            } else if(bitmapDes.otherPicType==-1&& bitmapDes.heartType == HeartType.GRAY) {
-                canvas.drawBitmap(mGrayBitmap, matrix, mBitmapPaint);
-            }else if(pics!=null){
-                canvas.drawBitmap(pics[bitmapDes.otherPicType], matrix, mBitmapPaint);
-            }
-
+            canvas.drawBitmap(bitmapDes.bitmap, matrix, mBitmapPaint);
             canvas.restore();
         }
     }
 
     float mTotalWidth, mTotalHeight;
-    private Bitmap mRedBitmap, mGrayBitmap;
     private Paint mBitmapPaint;
-
-    HeartFactory heartFactory;
-    private Bitmap gift1, gift2, gift3, gift4, gift5, gift6;
-    private int bitmapWidth, bitmapHeight;
+    private BitmapDesFactory bitmapDesFactory;
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -126,19 +136,11 @@ public class HeartView extends View {
         //防抖动
         mBitmapPaint.setDither(true);
         mBitmapPaint.setFilterBitmap(true);
-        heartFactory = new HeartFactory();
-        targetBitmapDes = heartFactory.generateHearts();
-
-        mRedBitmap = ((BitmapDrawable) getResources().getDrawable(R.mipmap.heart_red)).getBitmap();
-        mGrayBitmap = ((BitmapDrawable) getResources().getDrawable(R.mipmap.heart_gray)).getBitmap();
-        bitmapWidth = mRedBitmap.getWidth();
-        bitmapHeight = mRedBitmap.getHeight();
+        bitmapDesFactory = new BitmapDesFactory();
     }
 
-    private boolean isAddOtherPic = false;
     private Bitmap[] pics;
     public void addOtherPic() {
-        isAddOtherPic = true;
         pics=new Bitmap[6];
         pics[0]= ((BitmapDrawable) getResources().getDrawable(R.mipmap.gift1_pop)).getBitmap();
         pics[1] = ((BitmapDrawable) getResources().getDrawable(R.mipmap.gift2_pop)).getBitmap();
@@ -151,31 +153,30 @@ public class HeartView extends View {
     //被绘制位图的描述文件位置大小形变等等。
     private class BitmapDes {
         // 在绘制部分的位置
+        public BitmapDes(){
+            addTime=System.currentTimeMillis();
+        }
         float x, y;
         int alpha = 255;
         float scale;
-        // 控制心脏飘动的幅度
-        //随机性
-        float randomA;
-
-        // 起始时间(ms)
-        long startTime;
-        HeartView.HeartType heartType;
+        // 图片添加的时间
+        long addTime;
+        //随机性 控制飘动的幅度 0-1
+        float randomA=1;
         float t;
-        int otherPicType=-1;
-    }
+        Bitmap bitmap;
 
-    enum HeartType {
-        GRAY(0), RED(1);
-        int type;
+        public float w(){
+            return bitmap.getWidth();
+        }
 
-        HeartType(int type) {
-            this.type = type;
+        public float h(){
+            return bitmap.getHeight();
         }
     }
 
-    private class HeartFactory {
-        private static final int MAX_LEAFS = 0;
+
+    private class BitmapDesFactory {
         Random random = new Random();
         // 生成一个心信息
         public BitmapDes generateHeart() {
@@ -186,29 +187,11 @@ public class HeartView extends View {
             } else {
                 bitmapDes.randomA = random.nextFloat();
             }
-            int hearType = random.nextInt(2);
-            if (hearType == 0) {
-                bitmapDes.heartType = HeartType.GRAY;
-            } else {
-                bitmapDes.heartType = HeartType.RED;
-            }
-            if (isAddOtherPic&&random.nextInt(3) == 0) {
-                bitmapDes.otherPicType = random.nextInt(5);
-            }
-            bitmapDes.t = ((0.4f * random.nextFloat()) + 0.8f) * mTotalHeight;
-            bitmapDes.startTime = System.currentTimeMillis();
+            bitmapDes.bitmap = pics[random.nextInt(5)];
+            //0.8倍高度 -1.2倍高度之间。一个周期的路程
+            bitmapDes.t = ((0.5f * random.nextFloat()) + 0.7f) * mTotalHeight;
             return bitmapDes;
         }
 
-        public List<BitmapDes> generateHearts() {
-            return generateLeafs(MAX_LEAFS);
-        }
-        public List<BitmapDes> generateLeafs(int leafSize) {
-            List<BitmapDes> leafs = new LinkedList<BitmapDes>();
-            for (int i = 0; i < leafSize; i++) {
-                leafs.add(generateHeart());
-            }
-            return leafs;
-        }
     }
 }
