@@ -15,24 +15,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.R;
 import com.example.myapplication.widget.CommonphrasesAdapter;
-import com.example.myapplication.widget.HeartView;
+import com.example.myapplication.widget.PopTextView;
+import com.example.myapplication.widget.PraiseView;
 import com.example.myapplication.widget.IMConversation;
-import com.opensource.svgaplayer.SVGACallback;
 import com.opensource.svgaplayer.SVGADrawable;
 import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
 import com.opensource.svgaplayer.SVGAVideoEntity;
 
-import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.WeakHashMap;
 
@@ -49,6 +46,7 @@ public class HomeFragment extends Fragment {
     String[] animations;
     List<String> animationsList;
      SVGAParser parser;
+    int i=0;
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -80,25 +78,35 @@ public class HomeFragment extends Fragment {
             imConversation.name=new Random().nextInt()+"   "+i;
             if(i==14||i==10){
                 imConversation.name="系统消息1";
-
-
             }
             data.add(imConversation);
         }
         Collections.sort(data,conversationComparator);
         adapter.setData(data);
-    final HeartView heartView=view.findViewById(R.id.im_live_bottom_anim);
+    final PraiseView praiseView =view.findViewById(R.id.im_live_bottom_anim);
          animations= getResources().getStringArray(R.array.praise_array);
          animationsList=  Arrays.asList(animations);
          parser = SVGAParser.Companion.shareParser();
          parser.init(getActivity());
+        praiseView.init(R.array.drawables);
         final ViewGroup container=   (ViewGroup)view;
+
+        final PopTextView popTv=view.findViewById(R.id.pop_text);
+
         view.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                final SVGAImageView svgaImageView= getImageView();
 //                ((ViewGroup)view).addView(svgaImageView);
-                heartView.addHeart();
+//                praiseView.addPraise(1);
+                popTv.showAnnouncement("及时公告"+i++);
+            }
+        });
+
+        view.findViewById(R.id.button1).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                popTv.showFirstPopText("asdfasdfasdf");
             }
         });
     }
@@ -134,7 +142,6 @@ public class HomeFragment extends Fragment {
                     drawableCallback.path2Drawable(svgaDrawable);
                     drawablesMap.put(assetPath,svgaDrawable);
                 }
-
                 @Override
                 public void onError() {
                     drawableCallback.onError();

@@ -10,4 +10,13 @@
             <item>svga/live_praise/live_praise_red_gift.svga</item>
             <item>svga/live_praise/live_praise_yellow.svga</item>
     </string-array>
+
+    <string-array name="drawables">
+        <item>@drawable/gift1_pop</item>
+        <item>@drawable/gift2_pop</item>
+        <item>@drawable/gift3_pop</item>
+        <item>@drawable/gift4_pop</item>
+        <item>@drawable/gift5_pop</item>
+        <item>@drawable/gift6_pop</item>
+    </string-array>
 </resources>

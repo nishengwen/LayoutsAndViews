@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipChildren="true"
+    android:clipChildren="false"
     tools:context=".ui.home.HomeFragment">
     <com.example.myapplication.widget.QuickReturnLayout
         android:layout_width="match_parent"
@@ -15,6 +15,7 @@
         app:quickReturnHeaderChildVisible="@+id/visible"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        android:clipChildren="false"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <com.example.myapplication.widget.NestedScrollLinearLayout
@@ -22,6 +23,14 @@
             android:id="@+id/list_filter_result_tag"
             android:orientation="vertical"
             android:layout_height="wrap_content">
+            <com.example.myapplication.widget.PraiseView
+                android:id="@+id/im_live_bottom_anim"
+                android:layout_marginTop="-100dp"
+                android:layout_width="100dp"
+                android:layout_height="200dp"
+                android:clipChildren="false"
+                android:background="@android:color/holo_blue_dark"
+                app:layout_constraintTop_toTopOf="parent" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
@@ -46,16 +55,26 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_height="100dp"
-            android:text="asdfasdfasd"
+            android:background="@drawable/gift1_pop"
+            android:text="praiseView"
         android:layout_width="100dp"/>
 
-    <com.example.myapplication.widget.HeartView
-        android:id="@+id/im_live_bottom_anim"
-        android:layout_marginTop="200dp"
-        android:layout_width="200dp"
-        android:layout_height="100dp"
-        android:clipChildren="true"
-        android:background="@android:color/holo_blue_dark"
+    <TextView
+        android:id="@+id/button1"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/button"
+        android:layout_height="100dp"
+        android:text="popTextView"
+        android:background="@drawable/gift1_pop"
+        android:layout_width="100dp"/>
+
+
+    <com.example.myapplication.widget.PopTextView
+        android:id="@+id/pop_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:background="#000000"/>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
